@@ -2,8 +2,9 @@
 
 <div align="center">
 
-<img width="180" height="180" alt="urlshild_logo" src="https://github.com/user-attachments/assets/852aae6c-de18-4a7b-bb61-29c379f8436b" />
-
+<!-- Logo Space - Replace with your actual logo -->
+![URLShield Logo](https://via.placeholder.com/150x150/4A6FA5/FFFFFF?text=🛡️)
+*Logo Space - Replace this image with your 150x150 logo*
 
 ### **Real-Time AI Detection for Phishing, Malware & Defacement Threats**
 
