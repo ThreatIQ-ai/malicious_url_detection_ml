@@ -278,6 +278,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 </div>
 
 ---
-**upload the script**
 
 **Stay safe online — detect threats before they hit. 🛡️**
