@@ -1,4 +1,6 @@
 # 🛡️ URLShield - Advanced Phishing URL Detection Platform
+<div align="center">
+<img width="200" height="200" alt="urlshild_logo" src="https://github.com/user-attachments/assets/089a1e3c-242d-4651-a70e-1dda236a9723" />
 
 ![Banner](https://img.shields.io/badge/URLShield-Phishing_Detection-ff6b6b)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
@@ -6,10 +8,9 @@
 ![Accuracy](https://img.shields.io/badge/Accuracy-99.51%25-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-<div align="center">
   
   ![Phishing Detection](https://img.shields.io/badge/🔍-Real_Time_Analysis-9cf)
-  ![Flask](https://img.shields.io/badge/⚡-Flask_API-important)
+  ![Flask](https://img.shields.io/badge/⚡-Flask-000000)
   ![Production Ready](https://img.shields.io/badge/🚀-Production_Ready-success)
 
 </div>
