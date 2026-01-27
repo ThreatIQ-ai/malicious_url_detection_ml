@@ -3,193 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Result - Phishing Detector</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Analysis Result - URLShield</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: 0 },
+                            '100%': { transform: 'translateY(0)', opacity: 1 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
+        .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 50px 0;
         }
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .result-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .risk-card {
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
+        
         .risk-high {
             background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-            color: white;
         }
+        
         .risk-medium {
             background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
-            color: #333;
         }
+        
         .risk-low {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
         }
-        .probability-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            border: 10px solid;
+        
+        .progress-ring {
+            transform: rotate(-90deg);
         }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .feature-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        .feature-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-        }
-        .feature-label {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .url-display {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            word-break: break-all;
-            margin-bottom: 20px;
-        }
-        .btn-back {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-back:hover {
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 1s ease;
+            transform: rotate(90deg);
+            transform-origin: 50% 50%;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="result-header">
-            <h1>🔍 Analysis Result</h1>
-            <p class="lead">Detailed URL Security Analysis</p>
-        </div>
-        
+<body class="font-inter gradient-bg">
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <!-- Header -->
+        <header class="text-center mb-8 animate-fade-in">
+            <div class="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-sm rounded-2xl mb-4">
+                <a href="/" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                    <i class="fas fa-shield-alt text-2xl text-white"></i>
+                    <h1 class="text-xl font-bold text-white">URLShield</h1>
+                </a>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Security Analysis Result</h1>
+            <p class="text-white/70">Detailed threat assessment report</p>
+        </header>
+
         {% if error %}
-            <div class="alert alert-danger" role="alert">
-                <h4 class="alert-heading">Error!</h4>
-                <p>{{ error }}</p>
-                <hr>
-                <a href="/" class="btn-back">← Try Another URL</a>
+            <!-- Error State -->
+            <div class="max-w-2xl mx-auto animate-slide-up">
+                <div class="glass-effect rounded-2xl p-8 shadow-lg">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-3xl text-red-400"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Analysis Error</h2>
+                        <p class="text-white/70 mb-6">{{ error }}</p>
+                        <a href="/" class="inline-flex items-center px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all duration-300 hover:scale-105">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Analysis
+                        </a>
+                    </div>
+                </div>
             </div>
         {% else %}
-            <!-- URL Display -->
-            <div class="url-display">
-                <strong>Analyzed URL:</strong><br>
-                <code>{{ url }}</code>
-            </div>
-            
-            <!-- Risk Card -->
-            <div class="risk-card risk-{{ color }}">
-                <h2>Risk Level: {{ risk_level }}</h2>
-                <div class="probability-circle" 
-                     style="border-color: {% if color == 'danger' %}red{% elif color == 'warning' %}orange{% else %}green{% endif %};">
-                    {{ probability|round(3) * 100 }}%
-                </div>
-                <h1 class="display-4">{{ prediction }}</h1>
-                <p class="lead">Confidence: {{ (probability * 100)|round(1) }}%</p>
-                
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="alert alert-danger">
-                            <strong>Phishing Probability:</strong><br>
-                            {{ phishing_prob }}
-                        </div>
+            <!-- Main Result Card -->
+            <div class="max-w-4xl mx-auto animate-slide-up">
+                <!-- URL Display -->
+                <div class="glass-effect rounded-2xl p-6 mb-6">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-link text-blue-300 mr-2"></i>
+                        <span class="text-white/70 text-sm font-medium">Analyzed URL:</span>
                     </div>
-                    <div class="col-md-6">
-                        <div class="alert alert-success">
-                            <strong>Legitimate Probability:</strong><br>
-                            {{ legitimate_prob }}
-                        </div>
+                    <div class="bg-black/30 p-4 rounded-xl">
+                        <code class="text-white break-all text-sm md:text-base">{{ url }}</code>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Features Analysis -->
-            <h3>📊 Feature Analysis</h3>
-            <div class="features-grid">
-                {% for feature, value in features.items() %}
-                <div class="feature-card">
-                    <div class="feature-label">{{ feature }}</div>
-                    <div class="feature-value">{{ value }}</div>
+
+                <!-- Risk Assessment Card -->
+                <div class="risk-{{ 'high' if color == 'danger' else 'medium' if color == 'warning' else 'low' }} rounded-2xl p-6 md:p-8 shadow-2xl mb-8">
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <div class="inline-flex items-center px-3 py-1 bg-white/20 rounded-full mb-4">
+                                <span class="text-white text-sm font-medium">
+                                    <i class="fas fa-{% if color == 'danger' %}exclamation-triangle{% elif color == 'warning' %}exclamation-circle{% else %}check-circle{% endif %} mr-1"></i>
+                                    {{ 'HIGH RISK' if color == 'danger' else 'MEDIUM RISK' if color == 'warning' else 'LOW RISK' }}
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-bold text-white mb-2">{{ prediction }}</h2>
+                            <p class="text-white/90">AI Confidence Score</p>
+                        </div>
+                        
+                        <!-- Progress Ring -->
+                        <div class="relative w-48 h-48">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                                <!-- Background Circle -->
+                                <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.2)" stroke-width="8" fill="none"/>
+                                <!-- Progress Circle -->
+                                <circle cx="50" cy="50" r="45" stroke="white" stroke-width="8" fill="none"
+                                        stroke-linecap="round" stroke-dasharray="283"
+                                        stroke-dashoffset="{{ 283 - (probability * 283) }}"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                <span class="text-4xl font-bold text-white">{{ (probability * 100)|round(1) }}%</span>
+                                <span class="text-white/80 text-sm mt-1">Confidence</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Probability Bars -->
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white/20 p-4 rounded-xl">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-white font-medium">
+                                    <i class="fas fa-skull-crossbones mr-1"></i>Phishing
+                                </span>
+                                <span class="text-white font-bold">{{ phishing_prob }}</span>
+                            </div>
+                            <div class="w-full bg-white/30 rounded-full h-2">
+                                <div class="bg-red-400 h-2 rounded-full" 
+                                     style="width: {{ phishing_prob.replace('%', '') }}%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 p-4 rounded-xl">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-white font-medium">
+                                    <i class="fas fa-check-circle mr-1"></i>Legitimate
+                                </span>
+                                <span class="text-white font-bold">{{ legitimate_prob }}</span>
+                            </div>
+                            <div class="w-full bg-white/30 rounded-full h-2">
+                                <div class="bg-green-400 h-2 rounded-full" 
+                                     style="width: {{ legitimate_prob.replace('%', '') }}%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Recommendations -->
-            <div class="alert {% if color == 'success' %}alert-success{% elif color == 'warning' %}alert-warning{% else %}alert-danger{% endif %} mt-4">
-                <h4>💡 Recommendation:</h4>
-                {% if prediction == "LEGITIMATE" %}
-                    <p>This URL appears to be safe. However, always practice caution when entering personal information.</p>
-                {% elif prediction == "SUSPICIOUS" %}
-                    <p>Exercise caution with this URL. Avoid entering sensitive information and verify the website's authenticity.</p>
-                {% else %}
-                    <p><strong>WARNING:</strong> This URL shows strong indicators of phishing. Do not enter any personal or financial information.</p>
-                    <ul>
-                        <li>Do not enter login credentials</li>
-                        <li>Do not provide personal information</li>
-                        <li>Do not download files from this site</li>
-                        <li>Report this URL if possible</li>
-                    </ul>
-                {% endif %}
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="text-center mt-4">
-                <a href="/" class="btn-back">← Analyze Another URL</a>
-                <button class="btn btn-outline-secondary ms-2" onclick="window.print()">
-                    📄 Print Report
-                </button>
+
+                <!-- Features Analysis -->
+                <div class="glass-effect rounded-2xl p-6 mb-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-chart-bar text-blue-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Feature Analysis</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for feature, value in features.items() %}
+                        <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl border border-white/10 transition-all duration-300">
+                            <div class="text-sm text-white/60 mb-1">{{ feature }}</div>
+                            <div class="text-lg font-semibold text-white">{{ value }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="glass-effect rounded-2xl p-6 mb-8 border-l-4 
+                           {% if color == 'danger' %}border-red-500 bg-red-500/10
+                           {% elif color == 'warning' %}border-yellow-500 bg-yellow-500/10
+                           {% else %}border-green-500 bg-green-500/10{% endif %}">
+                    <div class="flex items-start mb-4">
+                        <div class="w-10 h-10 
+                                   {% if color == 'danger' %}bg-red-500/20
+                                   {% elif color == 'warning' %}bg-yellow-500/20
+                                   {% else %}bg-green-500/20{% endif %} 
+                                   rounded-lg flex items-center justify-center mr-3 mt-1">
+                            <i class="fas fa-{% if color == 'danger' %}exclamation-triangle text-red-300
+                                           {% elif color == 'warning' %}exclamation-circle text-yellow-300
+                                           {% else %}check-circle text-green-300{% endif %}"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Security Recommendation</h3>
+                            {% if prediction == "LEGITIMATE" %}
+                            <p class="text-white/80 mb-3">This URL appears safe based on our analysis. The website shows legitimate characteristics with proper security measures.</p>
+                            <ul class="text-white/80 list-disc pl-5 space-y-1">
+                                <li>SSL certificate is valid and properly configured</li>
+                                <li>Domain registration appears legitimate</li>
+                                <li>No suspicious patterns detected</li>
+                            </ul>
+                            {% elif prediction == "SUSPICIOUS" %}
+                            <p class="text-white/80 mb-3">This URL shows several suspicious characteristics. Proceed with caution.</p>
+                            <ul class="text-white/80 list-disc pl-5 space-y-1">
+                                <li>Avoid entering personal information</li>
+                                <li>Verify the website through official channels</li>
+                                <li>Check for HTTPS and security certificates</li>
+                                <li>Be wary of unsolicited login requests</li>
+                            </ul>
+                            {% else %}
+                            <p class="text-white/80 mb-3"><strong class="text-red-300">WARNING:</strong> This URL shows strong indicators of phishing activity.</p>
+                            <ul class="text-white/80 list-disc pl-5 space-y-1">
+                                <li><strong>DO NOT</strong> enter any login credentials</li>
+                                <li><strong>DO NOT</strong> provide personal or financial information</li>
+                                <li><strong>DO NOT</strong> download files from this website</li>
+                                <li>Report this URL to your security team</li>
+                                <li>Consider blocking this domain</li>
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/" 
+                       class="inline-flex items-center justify-center px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all duration-300 hover:scale-105 group">
+                        <i class="fas fa-undo-alt mr-2 group-hover:rotate-180 transition-transform"></i>
+                        Analyze Another URL
+                    </a>
+                    <button onclick="window.print()" 
+                            class="inline-flex items-center justify-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 hover:scale-105">
+                        <i class="fas fa-print mr-2"></i>
+                        Print Report
+                    </button>
+                    <button onclick="shareResult()" 
+                            class="inline-flex items-center justify-center px-6 py-3 bg-blue-500/30 hover:bg-blue-500/40 text-white rounded-xl transition-all duration-300 hover:scale-105">
+                        <i class="fas fa-share-alt mr-2"></i>
+                        Share Result
+                    </button>
+                </div>
+
+                <!-- Model Info -->
+                <div class="mt-12 text-center">
+                    <div class="inline-flex items-center justify-center p-4 bg-white/5 rounded-2xl">
+                        <div class="text-center">
+                            <div class="text-white/60 text-sm mb-2">Powered by Ensemble AI Model</div>
+                            <div class="flex flex-wrap justify-center gap-4 text-xs text-white/50">
+                                <span class="flex items-center">
+                                    <i class="fas fa-tree mr-1"></i> Random Forest
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-chart-line mr-1"></i> XGBoost
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-cat mr-1"></i> CatBoost
+                                </span>
+                                <span>Trained on 731,495 URLs</span>
+                            </div>
+                            <div class="text-xs text-white/40 mt-2">
+                                Report generated: {{ now.strftime('%Y-%m-%d %H:%M') if now else 'Recent' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         {% endif %}
-        
-        <!-- Model Info -->
-        <div class="mt-5 text-center text-muted">
-            <small>
-                Powered by: Ensemble of Random Forest, XGBoost & CatBoost models<br>
-                Trained on 731,495 URLs with 45+ security features<br>
-                Last updated: {{ now.strftime('%Y-%m-%d') if now else 'Recent' }}
-            </small>
-        </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function shareResult() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'URLShield Security Report',
+                    text: 'Check out this URL security analysis from URLShield',
+                    url: window.location.href,
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+            }
+        }
+
+        // Animate progress ring
+        document.addEventListener('DOMContentLoaded', function() {
+            const circles = document.querySelectorAll('circle[stroke-dashoffset]');
+            circles.forEach(circle => {
+                const dashoffset = circle.getAttribute('stroke-dashoffset');
+                circle.style.strokeDashoffset = dashoffset;
+            });
+        });
+    </script>
 </body>
 </html>

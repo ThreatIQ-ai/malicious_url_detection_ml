@@ -1,0 +1,108 @@
+# ===============================
+# Python
+# ===============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# ===============================
+# Virtual Environments
+# ===============================
+env/
+venv/
+ENV/
+.venv/
+.virtualenv/
+.virtualenvs/
+
+# ===============================
+# Flask / Web
+# ===============================
+instance/
+.webassets-cache
+*.log
+logs/
+flask_session/
+
+# ===============================
+# Jupyter Notebooks
+# ===============================
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# ===============================
+# Machine Learning / Data
+# ===============================
+data/
+datasets/
+*.h5
+*.pkl
+*.joblib
+*.model
+*.sav
+*.npy
+*.npz
+
+# ===============================
+# Build / Distribution
+# ===============================
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+pip-wheel-metadata/
+
+# ===============================
+# Testing / Coverage
+# ===============================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache/
+
+# ===============================
+# IDEs & Editors
+# ===============================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===============================
+# Environment Variables
+# ===============================
+.env
+.env.*
+*.env
+
+# ===============================
+# Logs
+# ===============================
+*.log
+log/
+logs/
+
+# ===============================
+# Misc
+# ===============================
+*.sqlite3
+*.db
+*.sql

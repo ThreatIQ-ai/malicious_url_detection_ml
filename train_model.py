@@ -32,33 +32,56 @@ def train_and_save_unified_model():
     pipeline = UnifiedPhishingPipeline(model_type='ensemble')
     pipeline.fit(X_train, y_train)
     
-    # Evaluate
-    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+    # Evaluate on test set
+    print("\nEvaluating on test set...")
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
     
     y_pred = pipeline.predict(X_test)
     y_test_binary = (y_test == 'phishing').astype(int)
     y_pred_binary = (np.array(y_pred) == 'phishing').astype(int)
     
-    print("\nModel Performance:")
+    print("\n" + "="*50)
+    print("Model Performance on Test Set:")
+    print("="*50)
     print(f"Accuracy: {accuracy_score(y_test_binary, y_pred_binary):.4f}")
     print(f"Precision: {precision_score(y_test_binary, y_pred_binary):.4f}")
     print(f"Recall: {recall_score(y_test_binary, y_pred_binary):.4f}")
     print(f"F1-Score: {f1_score(y_test_binary, y_pred_binary):.4f}")
     
-    # Test single prediction
-    print("\nTesting single URL prediction...")
+    print("\nClassification Report:")
+    print(classification_report(y_test_binary, y_pred_binary, 
+                               target_names=['legitimate', 'phishing']))
+    
+    # Test single prediction with error handling
+    print("\n" + "="*50)
+    print("Testing single URL prediction...")
+    print("="*50)
+    
     test_urls = [
         "https://www.wikipedia.org",
         "http://verify-paypal-account-secure-login.com",
-        "http://bit.ly/secure-banking-update"
+        "http://bit.ly/secure-banking-update",
+        "https://example.com/test.php",
+        "https://example.com/index.html",
+        "http://192.168.1.1/login.php"
     ]
     
     for url in test_urls:
-        proba = pipeline.predict_proba([url])[0]
-        pred = pipeline.predict([url])[0]
-        print(f"\nURL: {url}")
-        print(f"Prediction: {pred}")
-        print(f"Legitimate prob: {proba[0]:.3f}, Phishing prob: {proba[1]:.3f}")
+        try:
+            proba = pipeline.predict_proba([url])[0]
+            pred = pipeline.predict([url])[0]
+            print(f"\nURL: {url}")
+            print(f"Prediction: {pred}")
+            print(f"Legitimate prob: {proba[0]:.3f}, Phishing prob: {proba[1]:.3f}")
+            
+            # Show some extracted features
+            feature_extractor = pipeline.pipeline.named_steps['feature_extractor']
+            features = feature_extractor.transform([url])
+            print(f"Has file extension: {features['has_file_extension'].iloc[0]}")
+            print(f"Is PHP: {features['is_php'].iloc[0]}, Is HTML: {features['is_html'].iloc[0]}")
+            
+        except Exception as e:
+            print(f"\nError processing URL '{url}': {str(e)}")
     
     # Save complete pipeline as single .pkl
     pipeline.save('models/phishing_detector.pkl')
@@ -69,14 +92,14 @@ def train_and_save_unified_model():
     print("This single file contains both feature extraction and model.")
     print("="*50)
     
-    # Also save a smaller version for demo
-    sample_urls = [
-        "https://www.google.com",
-        "http://secure-login-verify-account.com",
-        "https://www.paypal.com"
-    ]
-    sample_df = pd.DataFrame({'url': sample_urls})
-    sample_df.to_csv('data/sample_urls.csv', index=False)
+    # Test loading and using the saved model
+    print("\nTesting saved model load...")
+    try:
+        loaded_pipeline = joblib.load('models/phishing_detector.pkl')
+        test_result = loaded_pipeline.predict(["https://www.google.com"])
+        print(f"✓ Model loaded successfully. Test prediction: {test_result[0]}")
+    except Exception as e:
+        print(f"✗ Error loading saved model: {e}")
 
 if __name__ == "__main__":
     train_and_save_unified_model()
