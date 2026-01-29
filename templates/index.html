@@ -75,7 +75,14 @@
 
     <div class="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <!-- Header -->
-        <header class="text-center mb-8 md:mb-12 animate-slide-up">
+        <header class="text-center mb-8 md:mb-12 animate-slide-up"><!-- Add this after the header section, inside the main container div -->
+        <div class="text-center mb-6">
+            <a href="/dashboard" 
+            class="inline-flex items-center px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 hover:scale-105 group">
+                <i class="fas fa-chart-bar mr-2 group-hover:rotate-12 transition-transform"></i>
+                View Analytics Dashboard
+            </a>
+        </div>
             <div class="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-sm rounded-2xl mb-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-shield-alt text-3xl text-white"></i>

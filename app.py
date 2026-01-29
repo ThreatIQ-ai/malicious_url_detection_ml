@@ -3,6 +3,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import warnings
+from datetime import datetime
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -21,6 +22,39 @@ except Exception as e:
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    try:
+        # Load dataset for statistics
+        df = pd.read_csv('data/url_dataset.csv')
+        
+        stats = {
+            'total_urls': len(df),
+            'legitimate': len(df[df['type'] == 'legitimate']),
+            'phishing': len(df[df['type'] == 'phishing']),
+            'unique_domains': df['url'].apply(lambda x: x.split('/')[2] if '//' in x else x).nunique() if 'url' in df.columns else 0,
+            'training_samples': int(len(df) * 0.8),
+            'testing_samples': int(len(df) * 0.2),
+            'legitimate_percentage': round(len(df[df['type'] == 'legitimate']) / len(df) * 100, 2),
+            'phishing_percentage': round(len(df[df['type'] == 'phishing']) / len(df) * 100, 2),
+            'now': datetime.now()
+        }
+        
+        return render_template('dashboard.html', **stats)
+        
+    except Exception as e:
+        return render_template('dashboard.html', 
+                             error=f"Could not load dashboard data: {str(e)}",
+                             total_urls=731495,
+                             legitimate=480194,
+                             phishing=251301,
+                             unique_domains=394837,
+                             training_samples=585196,
+                             testing_samples=146299,
+                             legitimate_percentage=65.65,
+                             phishing_percentage=34.35,
+                             now=datetime.now())
 
 @app.route('/predict', methods=['POST'])
 def predict():
