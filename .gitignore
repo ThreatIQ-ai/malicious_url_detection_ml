@@ -38,7 +38,6 @@ flask_session/
 data/
 datasets/
 *.h5
-*.pkl
 *.joblib
 *.model
 *.sav
