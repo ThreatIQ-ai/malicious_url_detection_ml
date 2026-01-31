@@ -161,7 +161,7 @@ class URLFeatureExtractor(BaseEstimator, TransformerMixin):
                     features['is_zip'] = 1 if ext == 'zip' else 0
                     
         except:
-            pass
+            pass    
         
         return features
     
