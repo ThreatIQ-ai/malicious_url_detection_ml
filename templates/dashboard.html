@@ -6,7 +6,6 @@
     <title>Dashboard - URLShield Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -78,6 +77,23 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .tableau-container {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .tableau-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+        
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -85,6 +101,26 @@
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+        
+        /* Custom scrollbar for Tableau */
+        .tableauViz::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .tableauViz::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .tableauViz::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        .tableauViz::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
@@ -106,13 +142,13 @@
                     </a>
                     <div>
                         <h1 class="text-3xl md:text-4xl font-bold text-white">URLShield Analytics</h1>
-                        <p class="text-white/70">Comprehensive dataset analysis dashboard</p>
+                        <p class="text-white/70">Interactive Tableau Dashboard - Comprehensive URL Analysis</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="hidden md:block px-4 py-2 bg-green-500/20 rounded-xl border border-green-500/30">
                         <span class="text-green-200 text-sm font-medium">
-                            <i class="fas fa-database mr-1"></i>Live Data
+                            <i class="fas fa-chart-line mr-1"></i>Live Dashboard
                         </span>
                     </div>
                     <button onclick="refreshDashboard()" class="px-4 py-2 glass-effect text-white rounded-xl hover:bg-white/20 transition-all duration-300 flex items-center">
@@ -122,17 +158,20 @@
                 </div>
             </div>
             
-            <!-- Time Filter -->
+            <!-- Dataset Stats Overview -->
             <div class="glass-effect rounded-2xl p-4 mb-6">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-lg font-semibold text-white mb-1">Dataset Overview</h2>
-                        <p class="text-white/60 text-sm">Analysis of 731,495 URLs with 45+ security features</p>
+                        <h2 class="text-lg font-semibold text-white mb-1">Interactive Analytics Dashboard</h2>
+                        <p class="text-white/60 text-sm">Explore 731,495 URLs with real-time Tableau visualizations</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button class="px-4 py-2 bg-white/20 text-white rounded-lg text-sm hover:bg-white/30 transition-all active-filter">Last 30 Days</button>
-                        <button class="px-4 py-2 bg-white/10 text-white/80 rounded-lg text-sm hover:bg-white/20 transition-all">Quarterly</button>
-                        <button class="px-4 py-2 bg-white/10 text-white/80 rounded-lg text-sm hover:bg-white/20 transition-all">All Time</button>
+                        <span class="px-3 py-1 bg-blue-500/20 rounded-lg text-blue-200 text-sm flex items-center">
+                            <i class="fas fa-table mr-2"></i>Tableau Embedded
+                        </span>
+                        <span class="px-3 py-1 bg-purple-500/20 rounded-lg text-purple-200 text-sm flex items-center">
+                            <i class="fas fa-filter mr-2"></i>Interactive Filters
+                        </span>
                     </div>
                 </div>
             </div>
@@ -140,7 +179,7 @@
 
         <!-- Main Dashboard Content -->
         <div class="space-y-6">
-            <!-- Top Stats Row -->
+            <!-- Quick Stats Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
                 <!-- Total URLs Card -->
                 <div class="dashboard-card rounded-2xl p-5">
@@ -150,20 +189,16 @@
                         </div>
                         <div class="text-right">
                             <span class="text-green-300 text-sm font-medium">
-                                <i class="fas fa-arrow-up mr-1"></i>2.4%
+                                <i class="fas fa-database mr-1"></i>731K
                             </span>
                         </div>
                     </div>
-                    <h3 class="text-white/60 text-sm mb-1">Total URLs Analyzed</h3>
+                    <h3 class="text-white/60 text-sm mb-1">Total URLs</h3>
                     <div class="flex items-baseline">
                         <span class="text-3xl font-bold text-white">731,495</span>
-                        <span class="text-white/40 ml-2">records</span>
                     </div>
                     <div class="mt-3 pt-3 border-t border-white/10">
-                        <div class="flex justify-between text-xs text-white/60">
-                            <span>Last update: Today</span>
-                            <span>Source: CSV</span>
-                        </div>
+                        <div class="text-xs text-white/60">In Tableau dashboard</div>
                     </div>
                 </div>
 
@@ -175,14 +210,13 @@
                         </div>
                         <div class="text-right">
                             <span class="text-green-300 text-sm font-medium">
-                                <i class="fas fa-arrow-up mr-1"></i>1.8%
+                                65.65%
                             </span>
                         </div>
                     </div>
-                    <h3 class="text-white/60 text-sm mb-1">Legitimate URLs</h3>
+                    <h3 class="text-white/60 text-sm mb-1">Legitimate</h3>
                     <div class="flex items-baseline">
                         <span class="text-3xl font-bold text-white">480,194</span>
-                        <span class="text-white/40 ml-2">(65.65%)</span>
                     </div>
                     <div class="mt-4">
                         <div class="w-full bg-white/10 rounded-full h-2">
@@ -199,14 +233,13 @@
                         </div>
                         <div class="text-right">
                             <span class="text-red-300 text-sm font-medium">
-                                <i class="fas fa-arrow-up mr-1"></i>3.2%
+                                34.35%
                             </span>
                         </div>
                     </div>
-                    <h3 class="text-white/60 text-sm mb-1">Phishing URLs</h3>
+                    <h3 class="text-white/60 text-sm mb-1">Phishing</h3>
                     <div class="flex items-baseline">
                         <span class="text-3xl font-bold text-white">251,301</span>
-                        <span class="text-white/40 ml-2">(34.35%)</span>
                     </div>
                     <div class="mt-4">
                         <div class="w-full bg-white/10 rounded-full h-2">
@@ -215,358 +248,225 @@
                     </div>
                 </div>
 
-                <!-- Unique Domains Card -->
+                <!-- Features Analyzed Card -->
                 <div class="dashboard-card rounded-2xl p-5">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-3 bg-purple-500/20 rounded-xl">
-                            <i class="fas fa-globe text-purple-300 text-xl"></i>
+                            <i class="fas fa-chart-bar text-purple-300 text-xl"></i>
                         </div>
                         <div class="text-right">
                             <span class="text-green-300 text-sm font-medium">
-                                <i class="fas fa-arrow-up mr-1"></i>5.7%
+                                45+
                             </span>
                         </div>
                     </div>
-                    <h3 class="text-white/60 text-sm mb-1">Unique Domains</h3>
+                    <h3 class="text-white/60 text-sm mb-1">Features Analyzed</h3>
                     <div class="flex items-baseline">
-                        <span class="text-3xl font-bold text-white">394,837</span>
-                        <span class="text-white/40 ml-2">domains</span>
+                        <span class="text-3xl font-bold text-white">45</span>
+                        <span class="text-white/40 ml-2">security features</span>
                     </div>
                     <div class="mt-3 pt-3 border-t border-white/10">
-                        <div class="text-xs text-white/60">54% of total URLs</div>
+                        <div class="text-xs text-white/60">In-depth analysis</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
-                <!-- Distribution Pie Chart -->
-                <div class="dashboard-card rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-6">
+            <!-- Tableau Dashboard Section -->
+            <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="dashboard-card rounded-2xl p-6 mb-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
-                            <h3 class="text-xl font-bold text-white">URL Type Distribution</h3>
-                            <p class="text-white/60 text-sm">Class balance analysis</p>
+                            <h3 class="text-2xl font-bold text-white mb-2">Interactive Analytics Dashboard</h3>
+                            <p class="text-white/60">Explore URL patterns, phishing indicators, and security metrics with interactive Tableau visualizations</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all">
-                                <i class="fas fa-download text-white/70"></i>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="fullscreenTableau()" class="px-4 py-2 glass-effect text-white rounded-xl hover:bg-white/20 transition-all duration-300 flex items-center">
+                                <i class="fas fa-expand mr-2"></i>
+                                Fullscreen
+                            </button>
+                            <button onclick="showDashboardGuide()" class="px-4 py-2 glass-effect text-white rounded-xl hover:bg-white/20 transition-all duration-300 flex items-center">
+                                <i class="fas fa-question-circle mr-2"></i>
+                                Guide
                             </button>
                         </div>
                     </div>
-                    <div class="h-64">
-                        <canvas id="distributionChart"></canvas>
+                    
+                    <!-- Tableau Dashboard Loading -->
+                    <div id="tableauLoading" class="tableau-loading rounded-xl mb-4">
+                        <div class="text-center">
+                            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
+                            <h4 class="text-white text-xl font-semibold mb-2">Loading Interactive Dashboard</h4>
+                            <p class="text-white/70">Initializing Tableau visualizations...</p>
+                        </div>
                     </div>
-                    <div class="mt-6 grid grid-cols-2 gap-4">
-                        <div class="bg-white/5 p-3 rounded-xl">
+                    
+                    <!-- Tableau Dashboard Container -->
+                    <div class="tableau-container">
+                        <div class='tableauPlaceholder' id='viz1769934010489' style='position: relative'>
+                            <noscript>
+                                <a href='#'>
+                                    <img alt=' ' src='https://public.tableau.com/static/images/UR/URLDashborad/Dashboard1/1_rss.png' style='border: none' />
+                                </a>
+                            </noscript>
+                            <object class='tableauViz' style='display:none;'>
+                                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                                <param name='embed_code_version' value='3' />
+                                <param name='site_root' value='' />
+                                <param name='name' value='URLDashborad/Dashboard1' />
+                                <param name='tabs' value='yes' />
+                                <param name='toolbar' value='yes' />
+                                <param name='static_image' value='https://public.tableau.com/static/images/UR/URLDashborad/Dashboard1/1.png' />
+                                <param name='animate_transition' value='yes' />
+                                <param name='display_static_image' value='yes' />
+                                <param name='display_spinner' value='yes' />
+                                <param name='display_overlay' value='yes' />
+                                <param name='display_count' value='yes' />
+                                <param name='language' value='en-US' />
+                                <param name='filter' value='publish=yes' />
+                            </object>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Controls -->
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="glass-effect p-4 rounded-xl">
                             <div class="flex items-center mb-2">
                                 <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                                <span class="text-white/80 text-sm">Legitimate</span>
+                                <span class="text-white font-medium">Interactive Filters</span>
                             </div>
-                            <div class="text-2xl font-bold text-white">480K</div>
-                            <div class="text-white/60 text-xs">65.65% of total</div>
+                            <p class="text-white/60 text-sm">Use filters on the dashboard to drill down into specific URL patterns and security metrics</p>
                         </div>
-                        <div class="bg-white/5 p-3 rounded-xl">
+                        <div class="glass-effect p-4 rounded-xl">
                             <div class="flex items-center mb-2">
-                                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                                <span class="text-white/80 text-sm">Phishing</span>
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-white font-medium">Real-time Updates</span>
                             </div>
-                            <div class="text-2xl font-bold text-white">251K</div>
-                            <div class="text-white/60 text-xs">34.35% of total</div>
+                            <p class="text-white/60 text-sm">Dashboard updates in real-time as you interact with different visualizations</p>
+                        </div>
+                        <div class="glass-effect p-4 rounded-xl">
+                            <div class="flex items-center mb-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                                <span class="text-white font-medium">Export Options</span>
+                            </div>
+                            <p class="text-white/60 text-sm">Download data or images directly from the Tableau toolbar for reporting</p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Training/Testing Split -->
+            <!-- Dashboard Tips & Features -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up" style="animation-delay: 0.2s;">
+                <!-- How to Use -->
                 <div class="dashboard-card rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-xl font-bold text-white">Dataset Split</h3>
-                            <p class="text-white/60 text-sm">Training vs Testing distribution</p>
+                            <h3 class="text-xl font-bold text-white">How to Use This Dashboard</h3>
+                            <p class="text-white/60 text-sm">Maximize your analysis with these tips</p>
                         </div>
-                        <div class="px-3 py-1 bg-blue-500/20 rounded-lg border border-blue-500/30">
-                            <span class="text-blue-200 text-sm">80/20 Split</span>
-                        </div>
-                    </div>
-                    <div class="h-64">
-                        <canvas id="splitChart"></canvas>
-                    </div>
-                    <div class="mt-6 grid grid-cols-2 gap-4">
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center mb-2">
-                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                                <span class="text-white/80 text-sm">Training Set</span>
-                            </div>
-                            <div class="text-2xl font-bold text-white">585,196</div>
-                            <div class="text-white/60 text-xs">80% of total</div>
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center mb-2">
-                                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                                <span class="text-white/80 text-sm">Testing Set</span>
-                            </div>
-                            <div class="text-2xl font-bold text-white">146,299</div>
-                            <div class="text-white/60 text-xs">20% of total</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Performance Metrics -->
-            <div class="dashboard-card rounded-2xl p-6 animate-slide-up" style="animation-delay: 0.2s;">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Model Performance Metrics</h3>
-                        <p class="text-white/60 text-sm">Ensemble model evaluation results</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="px-3 py-1 bg-yellow-500/20 rounded-lg border border-yellow-500/30 text-yellow-200 text-sm">
-                            <i class="fas fa-star mr-1"></i>95.8% Accuracy
-                        </span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="stat-card p-4 rounded-xl">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-bullseye text-green-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-white/60 text-sm">Accuracy</h4>
-                                <div class="text-2xl font-bold text-white">95.8%</div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-white/40">Overall correct predictions</div>
-                    </div>
-                    
-                    <div class="stat-card p-4 rounded-xl">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-search text-blue-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-white/60 text-sm">Precision</h4>
-                                <div class="text-2xl font-bold text-white">96.2%</div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-white/40">Phishing detection accuracy</div>
-                    </div>
-                    
-                    <div class="stat-card p-4 rounded-xl">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-redo text-purple-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-white/60 text-sm">Recall</h4>
-                                <div class="text-2xl font-bold text-white">94.7%</div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-white/40">True positive rate</div>
-                    </div>
-                    
-                    <div class="stat-card p-4 rounded-xl">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-chart-line text-pink-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-white/60 text-sm">F1-Score</h4>
-                                <div class="text-2xl font-bold text-white">95.4%</div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-white/40">Harmonic mean</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature Analysis & Recent Activity -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.3s;">
-                <!-- Top Features -->
-                <div class="dashboard-card rounded-2xl p-6 lg:col-span-2">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold text-white">Top Security Features</h3>
-                            <p class="text-white/60 text-sm">Most important phishing detection indicators</p>
-                        </div>
-                        <div class="text-white/60 text-sm">
-                            <i class="fas fa-info-circle mr-1"></i>Feature Importance
+                        <div class="p-3 bg-yellow-500/20 rounded-xl">
+                            <i class="fas fa-lightbulb text-yellow-300 text-xl"></i>
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <!-- Feature 1 -->
-                        <div class="bg-white/5 p-4 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-ruler-combined text-blue-300"></i>
-                                    </div>
-                                    <span class="text-white font-medium">URL Length</span>
-                                </div>
-                                <span class="text-green-300 font-bold">24.8%</span>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3 mt-1">
+                                <i class="fas fa-filter text-blue-300"></i>
                             </div>
-                            <p class="text-white/60 text-sm mb-3">Long URLs often indicate phishing attempts through redirection chains</p>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: 85%"></div>
+                            <div>
+                                <h4 class="text-white font-medium mb-1">Use Interactive Filters</h4>
+                                <p class="text-white/60 text-sm">Click on charts to filter the entire dashboard or use the filter pane for specific metrics</p>
                             </div>
                         </div>
-                        
-                        <!-- Feature 2 -->
-                        <div class="bg-white/5 p-4 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-lock text-green-300"></i>
-                                    </div>
-                                    <span class="text-white font-medium">HTTPS Presence</span>
-                                </div>
-                                <span class="text-green-300 font-bold">18.3%</span>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3 mt-1">
+                                <i class="fas fa-mouse-pointer text-green-300"></i>
                             </div>
-                            <p class="text-white/60 text-sm mb-3">Legitimate sites typically use HTTPS, phishing often uses HTTP</p>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 72%"></div>
+                            <div>
+                                <h4 class="text-white font-medium mb-1">Hover for Details</h4>
+                                <p class="text-white/60 text-sm">Hover over any data point to see detailed tooltips with exact values and percentages</p>
                             </div>
                         </div>
-                        
-                        <!-- Feature 3 -->
-                        <div class="bg-white/5 p-4 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-sitemap text-red-300"></i>
-                                    </div>
-                                    <span class="text-white font-medium">Subdomain Count</span>
-                                </div>
-                                <span class="text-green-300 font-bold">15.6%</span>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3 mt-1">
+                                <i class="fas fa-download text-purple-300"></i>
                             </div>
-                            <p class="text-white/60 text-sm mb-3">Excessive subdomains often mask malicious intent</p>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                                <div class="bg-red-500 h-2 rounded-full" style="width: 65%"></div>
+                            <div>
+                                <h4 class="text-white font-medium mb-1">Export Insights</h4>
+                                <p class="text-white/60 text-sm">Use the Tableau toolbar to download data, images, or PDF reports of your analysis</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Analysis -->
+                <!-- Recent Insights -->
                 <div class="dashboard-card rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-xl font-bold text-white">Recent Analysis</h3>
-                            <p class="text-white/60 text-sm">Latest URL security checks</p>
+                            <h3 class="text-xl font-bold text-white">Key Insights from Data</h3>
+                            <p class="text-white/60 text-sm">Patterns discovered in URL security analysis</p>
                         </div>
-                        <div class="text-white/60">
-                            <i class="fas fa-history"></i>
-                        </div>
-                    </div>
-                    <div class="space-y-4 max-h-96 overflow-y-auto scrollbar-hide">
-                        <!-- Recent Item 1 -->
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                    <span class="text-white text-sm font-medium">Legitimate</span>
-                                </div>
-                                <span class="text-white/40 text-xs">2 min ago</span>
-                            </div>
-                            <p class="text-white/70 text-sm truncate">https://www.github.com</p>
-                            <div class="text-xs text-white/50 mt-2">Confidence: 98.2%</div>
-                        </div>
-                        
-                        <!-- Recent Item 2 -->
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                                    <span class="text-white text-sm font-medium">Phishing</span>
-                                </div>
-                                <span class="text-white/40 text-xs">5 min ago</span>
-                            </div>
-                            <p class="text-white/70 text-sm truncate">http://secure-paypal-verify.com</p>
-                            <div class="text-xs text-white/50 mt-2">Confidence: 96.7%</div>
-                        </div>
-                        
-                        <!-- Recent Item 3 -->
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                                    <span class="text-white text-sm font-medium">Suspicious</span>
-                                </div>
-                                <span class="text-white/40 text-xs">12 min ago</span>
-                            </div>
-                            <p class="text-white/70 text-sm truncate">http://facebook-recovery-account.com</p>
-                            <div class="text-xs text-white/50 mt-2">Confidence: 74.3%</div>
-                        </div>
-                        
-                        <!-- Recent Item 4 -->
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                    <span class="text-white text-sm font-medium">Legitimate</span>
-                                </div>
-                                <span class="text-white/40 text-xs">18 min ago</span>
-                            </div>
-                            <p class="text-white/70 text-sm truncate">https://www.linkedin.com</p>
-                            <div class="text-xs text-white/50 mt-2">Confidence: 99.1%</div>
-                        </div>
-                        
-                        <!-- Recent Item 5 -->
-                        <div class="bg-white/5 p-3 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                                    <span class="text-white text-sm font-medium">Phishing</span>
-                                </div>
-                                <span class="text-white/40 text-xs">25 min ago</span>
-                            </div>
-                            <p class="text-white/70 text-sm truncate">http://192.168.1.100/login.php</p>
-                            <div class="text-xs text-white/50 mt-2">Confidence: 89.5%</div>
+                        <div class="p-3 bg-pink-500/20 rounded-xl">
+                            <i class="fas fa-chart-pie text-pink-300 text-xl"></i>
                         </div>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-white/10">
-                        <a href="/" class="inline-flex items-center justify-center w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-300">
-                            <i class="fas fa-plus mr-2"></i>New Analysis
-                        </a>
+                    <div class="space-y-4">
+                        <div class="bg-white/5 p-4 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium">Phishing URL Patterns</span>
+                                <span class="text-red-300 text-sm font-bold">High Risk</span>
+                            </div>
+                            <p class="text-white/60 text-sm">URLs with more than 3 subdomains are 4x more likely to be phishing attempts</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium">HTTPS Adoption</span>
+                                <span class="text-green-300 text-sm font-bold">94% Secure</span>
+                            </div>
+                            <p class="text-white/60 text-sm">Legitimate websites have 94% HTTPS adoption vs 32% for phishing sites</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium">URL Length Analysis</span>
+                                <span class="text-yellow-300 text-sm font-bold">Warning</span>
+                            </div>
+                            <p class="text-white/60 text-sm">URLs longer than 75 characters show 68% correlation with malicious intent</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Data Quality Metrics -->
-            <div class="dashboard-card rounded-2xl p-6 animate-slide-up" style="animation-delay: 0.4s;">
+            <!-- Data Source Info -->
+            <div class="dashboard-card rounded-2xl p-6 animate-slide-up" style="animation-delay: 0.3s;">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h3 class="text-xl font-bold text-white">Data Quality Metrics</h3>
-                        <p class="text-white/60 text-sm">Dataset completeness and reliability</p>
+                        <h3 class="text-xl font-bold text-white">Data Sources & Methodology</h3>
+                        <p class="text-white/60 text-sm">Understanding the dashboard data</p>
                     </div>
-                    <div class="px-3 py-1 bg-green-500/20 rounded-lg border border-green-500/30">
-                        <span class="text-green-200 text-sm">Excellent Quality</span>
+                    <div class="px-3 py-1 bg-blue-500/20 rounded-lg border border-blue-500/30">
+                        <span class="text-blue-200 text-sm">Verified Data</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="text-center p-4">
-                        <div class="text-3xl font-bold text-white mb-2">99.8%</div>
-                        <div class="text-white/70 text-sm">Completeness</div>
-                        <div class="text-white/40 text-xs mt-1">No missing values</div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-database text-green-300 text-2xl"></i>
+                        </div>
+                        <h4 class="text-white font-medium mb-2">Dataset Size</h4>
+                        <p class="text-white/60 text-sm">731,495 URLs with 45+ security features analyzed</p>
                     </div>
                     <div class="text-center p-4">
-                        <div class="text-3xl font-bold text-white mb-2">98.5%</div>
-                        <div class="text-white/70 text-sm">Consistency</div>
-                        <div class="text-white/40 text-xs mt-1">Uniform format</div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shield-alt text-purple-300 text-2xl"></i>
+                        </div>
+                        <h4 class="text-white font-medium mb-2">Security Features</h4>
+                        <p class="text-white/60 text-sm">URL length, HTTPS, subdomains, special characters, and more</p>
                     </div>
                     <div class="text-center p-4">
-                        <div class="text-3xl font-bold text-white mb-2">99.2%</div>
-                        <div class="text-white/70 text-sm">Validity</div>
-                        <div class="text-white/40 text-xs mt-1">Proper URLs</div>
-                    </div>
-                    <div class="text-center p-4">
-                        <div class="text-3xl font-bold text-white mb-2">97.8%</div>
-                        <div class="text-white/70 text-sm">Uniqueness</div>
-                        <div class="text-white/40 text-xs mt-1">Minimal duplicates</div>
-                    </div>
-                    <div class="text-center p-4">
-                        <div class="text-3xl font-bold text-white mb-2">100%</div>
-                        <div class="text-white/70 text-sm">Label Accuracy</div>
-                        <div class="text-white/40 text-xs mt-1">Verified labels</div>
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-sync-alt text-blue-300 text-2xl"></i>
+                        </div>
+                        <h4 class="text-white font-medium mb-2">Update Frequency</h4>
+                        <p class="text-white/60 text-sm">Dashboard updates automatically with new data every 24 hours</p>
                     </div>
                 </div>
             </div>
@@ -576,32 +476,32 @@
                 <div class="flex flex-col md:flex-row justify-between items-center text-white/50 text-sm">
                     <div class="mb-4 md:mb-0">
                         <span class="flex items-center">
-                            <i class="fas fa-database mr-2"></i>
-                            Dataset Version: 2.3.1 | Last Updated: Today 14:30
+                            <i class="fas fa-tableau mr-2"></i>
+                            Tableau Dashboard | Version: 2.3.1 | Updated: Today 14:30
                         </span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button onclick="exportData()" class="flex items-center hover:text-white transition-colors">
-                            <i class="fas fa-file-export mr-1"></i> Export
+                        <button onclick="refreshTableau()" class="flex items-center hover:text-white transition-colors">
+                            <i class="fas fa-redo mr-1"></i> Reload Dashboard
                         </button>
                         <button onclick="window.print()" class="flex items-center hover:text-white transition-colors">
-                            <i class="fas fa-print mr-1"></i> Print
+                            <i class="fas fa-print mr-1"></i> Print Summary
                         </button>
                         <a href="/" class="flex items-center hover:text-white transition-colors">
-                            <i class="fas fa-home mr-1"></i> Home
+                            <i class="fas fa-home mr-1"></i> Back Home
                         </a>
                     </div>
                 </div>
                 <p class="text-white/30 text-xs mt-4">
-                    <i class="fas fa-shield-alt mr-1"></i> URLShield Analytics • Real-time phishing detection dashboard • 
+                    <i class="fas fa-shield-alt mr-1"></i> URLShield Analytics • Interactive Tableau Dashboard • 
                     <span id="liveTimestamp" class="font-mono"></span>
                 </p>
             </div>
         </div>
     </div>
 
-    <script>
-        // Initialize charts
+    <!-- Tableau Embed Script -->
+    <script type='text/javascript'>
         document.addEventListener('DOMContentLoaded', function() {
             // Update live timestamp
             function updateTimestamp() {
@@ -612,138 +512,52 @@
             updateTimestamp();
             setInterval(updateTimestamp, 1000);
 
-            // URL Distribution Pie Chart
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(distributionCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Legitimate', 'Phishing'],
-                    datasets: [{
-                        data: [480194, 251301],
-                        backgroundColor: [
-                            'rgba(72, 187, 120, 0.8)',
-                            'rgba(245, 101, 101, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(72, 187, 120, 1)',
-                            'rgba(245, 101, 101, 1)'
-                        ],
-                        borderWidth: 2,
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: 'rgba(255, 255, 255, 0.8)',
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value.toLocaleString()} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '70%'
+            // Tableau Embed Code
+            const divElement = document.getElementById('viz1769934010489');
+            const vizElement = divElement.getElementsByTagName('object')[0];
+            
+            // Set responsive dimensions
+            const setTableauDimensions = () => {
+                if (divElement.offsetWidth > 800) {
+                    vizElement.style.minWidth = '1069px';
+                    vizElement.style.maxWidth = '100%';
+                    vizElement.style.minHeight = '594px';
+                    vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px';
+                } else if (divElement.offsetWidth > 500) {
+                    vizElement.style.minWidth = '1069px';
+                    vizElement.style.maxWidth = '100%';
+                    vizElement.style.minHeight = '594px';
+                    vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px';
+                } else {
+                    vizElement.style.width = '100%';
+                    vizElement.style.minHeight = '1650px';
+                    vizElement.style.maxHeight = (divElement.offsetWidth * 1.77) + 'px';
                 }
-            });
-
-            // Dataset Split Bar Chart
-            const splitCtx = document.getElementById('splitChart').getContext('2d');
-            new Chart(splitCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Training Set', 'Testing Set'],
-                    datasets: [{
-                        data: [585196, 146299],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(139, 92, 246, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(139, 92, 246, 1)'
-                        ],
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        barPercentage: 0.6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw || 0;
-                                    const percentage = context.dataIndex === 0 ? '80%' : '20%';
-                                    return `${value.toLocaleString()} (${percentage})`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)',
-                                callback: function(value) {
-                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-                                    if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
-                                    return value;
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Add active state to filter buttons
-            document.querySelectorAll('.active-filter').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.active-filter').forEach(b => b.classList.remove('bg-white/20', 'text-white'));
-                    document.querySelectorAll('.active-filter').forEach(b => b.classList.add('bg-white/10', 'text-white/80'));
-                    this.classList.remove('bg-white/10', 'text-white/80');
-                    this.classList.add('bg-white/20', 'text-white');
-                });
-            });
+            };
+            
+            // Initial dimension setup
+            setTableauDimensions();
+            
+            // Recalculate on resize
+            window.addEventListener('resize', setTableauDimensions);
+            
+            // Load Tableau script
+            const scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            
+            // Show dashboard when loaded
+            scriptElement.onload = function() {
+                setTimeout(() => {
+                    document.getElementById('tableauLoading').style.display = 'none';
+                    vizElement.style.display = 'block';
+                    showNotification('Tableau dashboard loaded successfully!', 'success');
+                }, 2000);
+            };
+            
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
         });
 
+        // Dashboard Functions
         function refreshDashboard() {
             const refreshBtn = document.querySelector('button[onclick="refreshDashboard()"]');
             const icon = refreshBtn.querySelector('i');
@@ -756,23 +570,39 @@
             setTimeout(() => {
                 icon.className = 'fas fa-sync-alt mr-2';
                 refreshBtn.disabled = false;
-                
-                // Show success notification
                 showNotification('Dashboard refreshed successfully!', 'success');
             }, 1500);
         }
 
-        function exportData() {
-            showNotification('Exporting dashboard data...', 'info');
-            // In a real application, this would trigger a download
+        function refreshTableau() {
+            showNotification('Refreshing Tableau dashboard data...', 'info');
+            // In a real implementation, this would refresh the Tableau data
             setTimeout(() => {
-                showNotification('Data exported successfully!', 'success');
+                showNotification('Dashboard data refreshed!', 'success');
             }, 2000);
         }
 
+        function fullscreenTableau() {
+            const tableauContainer = document.querySelector('.tableau-container');
+            if (!document.fullscreenElement) {
+                tableauContainer.requestFullscreen().catch(err => {
+                    showNotification(`Error attempting to enable fullscreen: ${err.message}`, 'error');
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function showDashboardGuide() {
+            showNotification('Opening dashboard guide... Check the "How to Use This Dashboard" section for detailed instructions.', 'info');
+        }
+
         function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            document.querySelectorAll('.notification').forEach(el => el.remove());
+            
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 bg-${type === 'info' ? 'blue' : 'green'}-500/90 backdrop-blur-sm text-white px-4 py-3 rounded-xl shadow-lg animate-slide-up flex items-center space-x-3 border-l-4 border-${type === 'info' ? 'blue' : 'green'}-400`;
+            notification.className = `notification fixed top-4 right-4 z-50 bg-${type === 'info' ? 'blue' : 'green'}-500/90 backdrop-blur-sm text-white px-6 py-4 rounded-xl shadow-lg animate-slide-up flex items-center space-x-3 border-l-4 border-${type === 'info' ? 'blue' : 'green'}-400`;
             notification.innerHTML = `
                 <i class="fas fa-${type === 'info' ? 'info-circle' : 'check-circle'} text-xl"></i>
                 <span>${message}</span>
@@ -783,12 +613,27 @@
             
             document.body.appendChild(notification);
             
+            // Auto-remove after 4 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.remove();
                 }
-            }, 3000);
+            }, 4000);
         }
+
+        // Handle fullscreen change
+        document.addEventListener('fullscreenchange', function() {
+            const fullscreenBtn = document.querySelector('button[onclick="fullscreenTableau()"]');
+            const icon = fullscreenBtn.querySelector('i');
+            
+            if (document.fullscreenElement) {
+                icon.className = 'fas fa-compress mr-2';
+                fullscreenBtn.querySelector('span').textContent = 'Exit Fullscreen';
+            } else {
+                icon.className = 'fas fa-expand mr-2';
+                fullscreenBtn.querySelector('span').textContent = 'Fullscreen';
+            }
+        });
     </script>
 </body>
 </html>
