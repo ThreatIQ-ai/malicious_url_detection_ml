@@ -9,6 +9,15 @@ import re
 from xgboost import XGBClassifier
 import tldextract
 from urllib.parse import urlparse, parse_qs
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier
+import warnings
+warnings.filterwarnings('ignore')
 
 class URLFeatureExtractor(BaseEstimator, TransformerMixin):
     """Feature extractor that works within sklearn pipeline"""
@@ -17,7 +26,9 @@ class URLFeatureExtractor(BaseEstimator, TransformerMixin):
         self.phishing_keywords = [
             'login', 'signin', 'verify', 'secure', 'account', 
             'update', 'confirm', 'banking', 'password', 'paypal',
-            'alert', 'urgent', 'suspension', 'limited', 'verification'
+            'alert', 'urgent', 'suspicion', 'limited', 'verification',
+            'bank', 'security', 'update', 'click', 'login',
+            'password', 'verify', 'account', 'secure', 'ebayisapi'
         ]
         # Store all feature names to ensure consistency
         self.feature_names_ = None
@@ -287,83 +298,329 @@ class URLFeatureExtractor(BaseEstimator, TransformerMixin):
         
         return entropy
 
+class ModelSelector:
+    """Handles model training, evaluation, and selection"""
+    
+    def __init__(self):
+        self.models = {}
+        self.results = {}
+        self.best_model = None
+        self.best_model_name = None
+        
+    def define_models(self):
+        """Define all candidate models without imbalance handling"""
+        models = {
+            # Traditional Models
+            'logistic_regression': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', LogisticRegression(
+                    random_state=42,
+                    max_iter=1000
+                ))
+            ]),
+            
+            'svm': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', SVC(
+                    kernel='rbf',
+                    random_state=42,
+                    probability=True
+                ))
+            ]),
+            
+            'knn': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', KNeighborsClassifier(
+                    n_neighbors=5
+                ))
+            ]),
+            
+            'decision_tree': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', DecisionTreeClassifier(
+                    random_state=42,
+                    max_depth=20,
+                    min_samples_split=10
+                ))
+            ]),
+            
+            # Ensemble Models
+            'random_forest': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', RandomForestClassifier(
+                    n_estimators=100,
+                    max_depth=15,
+                    random_state=42,
+                    n_jobs=-1
+                ))
+            ]),
+            
+            'xgboost': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', XGBClassifier(
+                    n_estimators=100,
+                    max_depth=8,
+                    learning_rate=0.1,
+                    random_state=42,
+                    use_label_encoder=False,
+                    eval_metric='logloss',
+                    n_jobs=-1
+                ))
+            ]),
+            
+            'catboost': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', CatBoostClassifier(
+                    iterations=100,
+                    depth=8,
+                    learning_rate=0.1,
+                    verbose=False,
+                    random_state=42
+                ))
+            ]),
+            
+            'gradient_boosting': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', GradientBoostingClassifier(
+                    n_estimators=100,
+                    max_depth=5,
+                    random_state=42
+                ))
+            ]),
+            
+            'adaboost': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', AdaBoostClassifier(
+                    n_estimators=100,
+                    random_state=42
+                ))
+            ]),
+            
+            # Ensemble of ensembles
+            'voting_ensemble': Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', VotingClassifier(
+                    estimators=[
+                        ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
+                        ('xgb', XGBClassifier(n_estimators=50, random_state=42, use_label_encoder=False)),
+                        ('cb', CatBoostClassifier(iterations=50, verbose=False, random_state=42))
+                    ],
+                    voting='soft'
+                ))
+            ])
+        }
+        return models
+    
+    def train_and_evaluate(self, X_train, y_train, X_val, y_val):
+        """Train and evaluate all models on sample data"""
+        from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+        
+        self.models = self.define_models()
+        
+        print("\n" + "="*70)
+        print("TRAINING AND EVALUATING MODELS ON SAMPLE DATA")
+        print("="*70)
+        print(f"Training samples: {X_train.shape[0]}")
+        print(f"Validation samples: {X_val.shape[0]}")
+        
+        for name, model in self.models.items():
+            print(f"\nTraining {name}...")
+            
+            try:
+                # Train model
+                model.fit(X_train, y_train)
+                
+                # Predict on validation set
+                y_pred = model.predict(X_val)
+                y_pred_proba = model.predict_proba(X_val)[:, 1] if hasattr(model, 'predict_proba') else None
+                
+                # Calculate metrics
+                accuracy = accuracy_score(y_val, y_pred)
+                precision = precision_score(y_val, y_pred, zero_division=0)
+                recall = recall_score(y_val, y_pred, zero_division=0)
+                f1 = f1_score(y_val, y_pred, zero_division=0)
+                
+                results = {
+                    'accuracy': accuracy,
+                    'precision': precision,
+                    'recall': recall,
+                    'f1_score': f1,
+                    'model': model
+                }
+                
+                # Add AUC if available
+                if y_pred_proba is not None:
+                    try:
+                        auc = roc_auc_score(y_val, y_pred_proba)
+                        results['auc'] = auc
+                    except:
+                        results['auc'] = 0.0
+                
+                self.results[name] = results
+                
+                print(f"  ✓ Accuracy: {accuracy:.4f}")
+                print(f"  ✓ Precision: {precision:.4f}")
+                print(f"  ✓ Recall: {recall:.4f}")
+                print(f"  ✓ F1-Score: {f1:.4f}")
+                if 'auc' in results:
+                    print(f"  ✓ AUC: {results['auc']:.4f}")
+                    
+            except Exception as e:
+                print(f"  ✗ Error training {name}: {str(e)}")
+                # Create dummy results for failed model
+                self.results[name] = {
+                    'accuracy': 0,
+                    'precision': 0,
+                    'recall': 0,
+                    'f1_score': 0,
+                    'auc': 0,
+                    'model': None,
+                    'error': str(e)
+                }
+        
+        # Select best model based on F1-score
+        self.select_best_model()
+    
+    def select_best_model(self):
+        """Select the best model based on F1-score"""
+        best_f1 = -1
+        best_name = None
+        
+        for name, result in self.results.items():
+            if result['model'] is not None and result['f1_score'] > best_f1:
+                best_f1 = result['f1_score']
+                best_name = name
+        
+        if best_name is None:
+            # Fallback to accuracy if all models failed
+            for name, result in self.results.items():
+                if result['model'] is not None and result['accuracy'] > best_f1:
+                    best_f1 = result['accuracy']
+                    best_name = name
+        
+        if best_name is not None:
+            self.best_model_name = best_name
+            self.best_model = self.results[best_name]['model']
+            
+            print("\n" + "="*70)
+            print(f"🏆 BEST MODEL SELECTED: {best_name}")
+            print(f"Best F1-Score on validation: {best_f1:.4f}")
+            print("="*70)
+        else:
+            print("\n❌ Warning: No valid model found!")
+            self.best_model_name = None
+            self.best_model = None
+    
+    def get_best_model_info(self):
+        """Return the best model and its name"""
+        return self.best_model, self.best_model_name
+    
+    def get_all_results(self):
+        """Return all evaluation results"""
+        return self.results
+    
+    def print_model_comparison(self):
+        """Print comparison of all models"""
+        print("\n" + "="*70)
+        print("MODEL COMPARISON SUMMARY (Sample Data)")
+        print("="*70)
+        
+        headers = ["Rank", "Model", "Accuracy", "Precision", "Recall", "F1-Score", "AUC", "Status"]
+        rows = []
+        
+        valid_results = {k: v for k, v in self.results.items() if v['model'] is not None}
+        
+        # Sort by F1-score
+        sorted_models = sorted(valid_results.items(), key=lambda x: x[1]['f1_score'], reverse=True)
+        
+        for rank, (name, result) in enumerate(sorted_models, 1):
+            row = [
+                rank,
+                name,
+                f"{result['accuracy']:.4f}",
+                f"{result['precision']:.4f}",
+                f"{result['recall']:.4f}",
+                f"{result['f1_score']:.4f}",
+                f"{result.get('auc', 0):.4f}",
+                "✓"
+            ]
+            rows.append(row)
+        
+        # Add failed models
+        failed_models = {k: v for k, v in self.results.items() if v['model'] is None}
+        for name, result in failed_models.items():
+            row = [
+                "-",
+                name,
+                "0.0000",
+                "0.0000",
+                "0.0000",
+                "0.0000",
+                "0.0000",
+                "✗"
+            ]
+            rows.append(row)
+        
+        # Print table
+        col_widths = [max(len(str(item)) for item in col) for col in zip(*[headers] + rows)]
+        
+        # Print headers
+        header_row = " | ".join(h.ljust(w) for h, w in zip(headers, col_widths))
+        print(header_row)
+        print("-" * len(header_row))
+        
+        # Print rows
+        for row in rows:
+            print(" | ".join(str(item).ljust(w) for item, w in zip(row, col_widths)))
+
 class UnifiedPhishingPipeline:
     """Complete pipeline from URL to prediction in one object"""
     
-    def __init__(self, model_type='ensemble'):
-        self.model_type = model_type
-        self.pipeline = self._create_unified_pipeline()
-    
-    def _create_unified_pipeline(self):
-        """Create a single pipeline with feature extraction + model"""
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.impute import SimpleImputer
-        from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-        from xgboost import XGBClassifier
-        from catboost import CatBoostClassifier
+    def __init__(self, model=None, feature_extractor=None):
+        if feature_extractor is None:
+            self.feature_extractor = URLFeatureExtractor()
+        else:
+            self.feature_extractor = feature_extractor
         
-        # Create the complete pipeline
-        pipeline = Pipeline([
-            ('feature_extractor', URLFeatureExtractor()),
-            ('imputer', SimpleImputer(strategy='constant', fill_value=0)),  # Changed to constant
-            ('scaler', StandardScaler()),
-            ('classifier', self._get_model())
-        ])
-        
-        return pipeline
+        if model is None:
+            # Create a default pipeline
+            from sklearn.ensemble import RandomForestClassifier
+            self.pipeline = Pipeline([
+                ('feature_extractor', self.feature_extractor),
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', RandomForestClassifier(
+                    n_estimators=100,
+                    max_depth=15,
+                    random_state=42
+                ))
+            ])
+        else:
+            # Wrap the provided model in a complete pipeline
+            self.pipeline = Pipeline([
+                ('feature_extractor', self.feature_extractor),
+                ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                ('scaler', StandardScaler()),
+                ('classifier', model)
+            ])
     
-    def _get_model(self):
-        """Get the appropriate model"""
-        if self.model_type == 'random_forest':
-            return RandomForestClassifier(
-                n_estimators=200,
-                max_depth=20,
-                random_state=42,
-                class_weight='balanced',
-                n_jobs=-1
-            )
-        elif self.model_type == 'xgboost':
-            return XGBClassifier(
-                n_estimators=200,
-                max_depth=10,
-                learning_rate=0.1,
-                random_state=42,
-                use_label_encoder=False,
-                eval_metric='logloss',
-                n_jobs=-1
-            )
-        elif self.model_type == 'catboost':
-            return CatBoostClassifier(
-                iterations=200,
-                depth=10,
-                learning_rate=0.1,
-                verbose=False,
-                random_state=42
-            )
-        else:  # ensemble
-            rf = RandomForestClassifier(
-                n_estimators=100,
-                max_depth=15,
-                random_state=42,
-                class_weight='balanced'
-            )
-            xgb = XGBClassifier(
-                n_estimators=100,
-                max_depth=8,
-                random_state=42,
-                use_label_encoder=False
-            )
-            cb = CatBoostClassifier(
-                iterations=100,
-                depth=8,
-                learning_rate=0.1,
-                verbose=False,
-                random_state=42
-            )
-            return VotingClassifier(
-                estimators=[('rf', rf), ('xgb', xgb), ('cb', cb)],
-                voting='soft'
-            )
+    @classmethod
+    def from_pipeline(cls, pipeline):
+        """Create UnifiedPhishingPipeline from an existing sklearn pipeline"""
+        instance = cls()
+        instance.pipeline = pipeline
+        instance.feature_extractor = pipeline.named_steps['feature_extractor']
+        return instance
     
     def fit(self, X, y):
         """Train the complete pipeline"""
@@ -383,11 +640,15 @@ class UnifiedPhishingPipeline:
     
     def save(self, filepath):
         """Save the complete pipeline to a single .pkl file"""
+        # ✅ FIX: Save the sklearn pipeline directly
         joblib.dump(self.pipeline, filepath)
-        print(f"Complete pipeline saved to {filepath}")
+        print(f"✓ Complete pipeline saved to {filepath}")
     
     @staticmethod
     def load(filepath):
         """Load a saved pipeline"""
-        pipeline = joblib.load(filepath)
-        return pipeline
+        loaded_pipeline = joblib.load(filepath)
+        instance = UnifiedPhishingPipeline()
+        instance.pipeline = loaded_pipeline
+        instance.feature_extractor = loaded_pipeline.named_steps['feature_extractor']
+        return instance
