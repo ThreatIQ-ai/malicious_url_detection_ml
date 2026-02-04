@@ -5,6 +5,9 @@ import pandas as pd
 import warnings
 from datetime import datetime
 warnings.filterwarnings('ignore')
+import os
+
+
 
 app = Flask(__name__)
 
@@ -214,4 +217,5 @@ def health():
         return jsonify({'status': 'unhealthy', 'model_loaded': False}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host='0.0.0.0', port=port)
